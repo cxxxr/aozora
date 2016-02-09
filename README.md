@@ -23,3 +23,6 @@ emacsで青空文庫の縦書き表示
 `p` -- カーソルを上へ移動  
 `RET` -- そのファイルを表示  
 `s` -- バフッファの更新
+
+## ライセンス
+[MIT](https://github.com/cxxxr/aozora/blob/master/LICENSE)
