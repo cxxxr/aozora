@@ -7,6 +7,25 @@
 (require 'aozora-face)
 (require 'aozora-tategaki)
 
+(defvar aozora-gaiji-table
+  (let ((gaiji-file
+	 (expand-file-name "aozora_gaiji_chuki.txt"
+			   (file-name-directory
+			    (or (and (boundp 'byte-compile-current-file)
+				     byte-compile-current-file)
+				load-file-name
+				buffer-file-name))))
+	(table (make-hash-table :test 'equal)))
+    (unless (file-exists-p gaiji-file)
+      (error "Gaiji data file not found!"))
+    (with-temp-buffer
+      (insert-file-contents gaiji-file)
+      (while (re-search-forward
+	      "^.+?	.+?	.*?	\\(.+?\\)	※［＃\\(.+?\\)[］、]"
+	      nil t)
+	(puthash (match-string 2) (match-string 1) table)))
+    table))
+
 (defgroup aozora nil
   "青空文庫ビューア"
   :prefix "aozora-"
@@ -370,6 +389,10 @@
   (aozora-do-replace-regex
    "※［＃[^、］]+、UCS-\\([0-9A-F]+\\)、[^］]+］"
    (char-to-string (string-to-number (match-string 1) 16))
+   t)
+  (aozora-do-replace-regex
+   "※［＃\\([^、］]+\\)、[^］]+］"
+   (gethash (match-string 1) aozora-gaiji-table)
    t))
 
 (defun aozora-remove-cannot-cope-annotation ()
